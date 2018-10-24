@@ -6,8 +6,8 @@
 &nbsp;&nbsp;<font color="red">@define_colour</font>&nbsp;<font color="green">&apos;red&apos;</font><br>
 &nbsp;&nbsp;<font color="red">@directive_colour</font>&nbsp;<font color="green">&apos;red&apos;</font><br>
 &nbsp;&nbsp;<font color="red">@identifier_colour</font>&nbsp;<font color="green">&apos;black&apos;</font><br>
-&nbsp;&nbsp;<font color="red">@key_colour</font>&nbsp;<font color="green">&apos;sky blue&apos;</font><br>
-&nbsp;&nbsp;<font color="red">@module_colour</font>&nbsp;<font color="green">&apos;sienna&apos;</font><br>
+&nbsp;&nbsp;<font color="gray"># @key_colour &apos;sky blue&apos;
+<br></font>&nbsp;&nbsp;<font color="red">@module_colour</font>&nbsp;<font color="green">&apos;sienna&apos;</font><br>
 &nbsp;&nbsp;<font color="red">@nullarg_colour</font>&nbsp;<font color="green">&apos;gray&apos;</font><br>
 &nbsp;&nbsp;<font color="red">@string_colour</font>&nbsp;<font color="green">&apos;green&apos;</font><br>
 <br>
@@ -222,7 +222,7 @@
 <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">output</font>&nbsp;=<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">case</font>&nbsp;<font color="black">res</font>&nbsp;<font color="#A74AC7">do</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<font color="black">ext</font>,&nbsp;<font color="black">path</font>]&nbsp;-&gt;&nbsp;<font color="sienna">String</font>.<font color="black">reverse</font>(<font color="sienna">path</font>)&nbsp;&lt;&gt;&nbsp;<font color="green">&quot;.html&quot;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<font color="gray">_ext</font>,&nbsp;<font color="black">path</font>]&nbsp;-&gt;&nbsp;<font color="sienna">String</font>.<font color="black">reverse</font>(<font color="sienna">path</font>)&nbsp;&lt;&gt;&nbsp;<font color="green">&quot;.html&quot;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<font color="black">path</font>]&nbsp;-&gt;&nbsp;<font color="sienna">String</font>.<font color="black">reverse</font>(<font color="sienna">path</font>)&nbsp;&lt;&gt;&nbsp;<font color="green">&quot;.html&quot;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
 <br>
