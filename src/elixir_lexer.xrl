@@ -43,7 +43,7 @@ String_sq   = '.*'
 String_dq   = ".*"
 Define      = @[a-z_]+
 Pointer     = ->
-Syntax      = [=+-|]
+Syntax      = [=+-|&]
 Integer     = [0-9]+
 
 NullArg     = {ArgUnused}
