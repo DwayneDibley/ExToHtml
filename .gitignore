@@ -1,0 +1,4 @@
+
+/_build
+/.elixir_ls
+src/elixir_lexer.erl
