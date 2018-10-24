@@ -30,8 +30,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<font color="sienna">Main</font>&nbsp;<font color="black">entry</font>&nbsp;<font color="black">point</font>&nbsp;<font color="black">for</font>&nbsp;<font color="black">escript</font>.&nbsp;<font color="sienna">The</font>&nbsp;<font color="black">argument</font>&nbsp;<font color="black">is</font>&nbsp;<font color="black">the</font>&nbsp;<font color="black">name</font>&nbsp;<font color="black">of</font>&nbsp;<font color="black">the</font>&nbsp;<font color="black">source</font>&nbsp;<font color="black">file</font>.<br>
 &nbsp;&nbsp;<font color="green">&quot;&quot;&quot;</font><br>
 &nbsp;&nbsp;<font color="#A74AC7">def</font>&nbsp;<font color="black">main</font>(<font color="sienna">args</font>)&nbsp;<font color="#A74AC7">do</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;<font color="gray"># Logger.info(&quot;Args: #{inspect(args)}&quot;)
-<br></font>&nbsp;&nbsp;&nbsp;&nbsp;[<font color="black">filename</font>]&nbsp;=&nbsp;<font color="black">args</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;[<font color="black">filename</font>]&nbsp;=&nbsp;<font color="black">args</font><br>
 <br>
 &nbsp;&nbsp;&nbsp;&nbsp;<font color="black">case</font>&nbsp;<font color="black">getFiles</font>(<font color="sienna">filename</font>)&nbsp;<font color="#A74AC7">do</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="blue">:error</font>,&nbsp;<font color="black">why</font>}&nbsp;-&gt;&nbsp;<font color="sienna">IO</font>.<font color="black">puts</font>(<font color="sienna">why</font>)<br>
@@ -61,10 +60,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
 <br>
 &nbsp;&nbsp;&nbsp;&nbsp;<font color="black">html</font>&nbsp;=&nbsp;<font color="sienna">Enum</font>.<font color="black">join</font>(<font color="sienna">colourize</font>(<font color="sienna">tokens</font>))<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<font color="gray"># Logger.info(&quot;html 1 = #{inspect(html)}&quot;)
-<br></font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;<font color="gray"># Logger.info(&quot;Writing to: #{inspect(outputFile)}&quot;)
-<br></font>&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">:ok</font>&nbsp;=&nbsp;<font color="sienna">File</font>.<font color="black">write</font>(<font color="sienna">outputFile</font>,&nbsp;<font color="sienna">html</font>,&nbsp;[<font color="blue">:write</font>])<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">:ok</font>&nbsp;=&nbsp;<font color="sienna">File</font>.<font color="black">write</font>(<font color="sienna">outputFile</font>,&nbsp;<font color="sienna">html</font>,&nbsp;[<font color="blue">:write</font>])<br>
 &nbsp;&nbsp;&nbsp;&nbsp;{<font color="blue">:ok</font>,&nbsp;<font color="black">self</font>()}<br>
 &nbsp;&nbsp;<font color="#A74AC7">end</font><br>
 <br>
@@ -211,11 +207,6 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_&nbsp;-&gt;&nbsp;<font color="sienna">System</font>.<font color="black">cwd</font>()&nbsp;|&gt;&nbsp;<font color="sienna">Path</font>.<font color="black">join</font>(<font color="sienna">input</font>)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
 <br>
-&nbsp;&nbsp;&nbsp;&nbsp;<font color="gray"># Logger.info(&quot;full input = #{inspect(input)}&quot;)
-<br></font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;<font color="gray"># Logger.info(&quot;reversed = #{inspect(String.reverse(input))}&quot;)
-<br></font>&nbsp;&nbsp;&nbsp;&nbsp;<font color="gray"># Logger.info(&quot;split = #{inspect(String.reverse(input))}&quot;)
-<br></font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;<font color="black">case</font>&nbsp;<font color="sienna">File</font>.<font color="black">exists</font>?(<font color="sienna">input</font>)&nbsp;<font color="#A74AC7">do</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">true</font>&nbsp;-&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">res</font>&nbsp;=&nbsp;<font color="sienna">String</font>.<font color="black">split</font>(<font color="sienna">String</font>.<font color="sienna">reverse</font>(<font color="sienna">input</font>),&nbsp;<font color="green">&quot;.&quot;</font>,&nbsp;<font color="black">parts</font>:&nbsp;2)<br>

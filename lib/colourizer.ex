@@ -30,7 +30,6 @@ defmodule Colourizer do
     Main entry point for escript. The argument is the name of the source file.
   """
   def main(args) do
-    # Logger.info("Args: #{inspect(args)}")
     [filename] = args
 
     case getFiles(filename) do
@@ -61,9 +60,6 @@ defmodule Colourizer do
       end
 
     html = Enum.join(colourize(tokens))
-    # Logger.info("html 1 = #{inspect(html)}")
-
-    # Logger.info("Writing to: #{inspect(outputFile)}")
     :ok = File.write(outputFile, html, [:write])
     {:ok, self()}
   end
@@ -210,11 +206,6 @@ defmodule Colourizer do
         "/" -> input
         _ -> System.cwd() |> Path.join(input)
       end
-
-    # Logger.info("full input = #{inspect(input)}")
-
-    # Logger.info("reversed = #{inspect(String.reverse(input))}")
-    # Logger.info("split = #{inspect(String.reverse(input))}")
 
     case File.exists?(input) do
       true ->
