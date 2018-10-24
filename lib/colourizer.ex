@@ -1,0 +1,235 @@
+defmodule Colourizer do
+  @argument_colour 'sienna'
+  @atom_colour 'blue'
+  @block_colour '#A74AC7'
+  @comment_colour 'gray'
+  @define_colour 'red'
+  @directive_colour 'red'
+  @identifier_colour 'black'
+  @key_colour 'sky blue'
+  @module_colour 'sienna'
+  @nullarg_colour 'gray'
+  @string_colour 'green'
+
+  require Logger
+
+  @moduledoc """
+  ## NAME
+       extohtml
+
+  ## SYNOPSIS
+       extohtml file
+
+  ## DESCRIPTION
+       Creates an HTML file containing a colourised representation of the input file.
+
+       The input file is expected to contain Elixir code.
+  """
+
+  @doc """
+    Main entry point for escript. The argument is the name of the source file.
+  """
+  def main(args) do
+    # Logger.info("Args: #{inspect(args)}")
+    [filename] = args
+
+    case getFiles(filename) do
+      {:error, why} -> IO.puts(why)
+      {:ok, inputFile, outputFile} -> colourize(inputFile, outputFile)
+    end
+  end
+
+  @doc """
+    Colourise the contents of the input file, checking that the input file is OK.
+  """
+  def colourize(inputFile, outputFile) do
+    tokens =
+      case File.read(inputFile) do
+        {:ok, code} ->
+          case lex(code) do
+            {:ok, tokens} ->
+              tokens
+
+            why ->
+              IO.puts(why)
+              []
+          end
+
+        {:error, why} ->
+          IO.puts(why)
+          []
+      end
+
+    html = Enum.join(colourize(tokens))
+    # Logger.info("html 1 = #{inspect(html)}")
+
+    # Logger.info("Writing to: #{inspect(outputFile)}")
+    :ok = File.write(outputFile, html, [:write])
+    {:ok, self()}
+  end
+
+  @doc """
+  Iterate over the list of tokens returned by lex, turning them into HTML
+  """
+  # Logger.info("#{inspect(tokens)}")
+  def colourize(tokens) do
+    html = colourize(tokens, ["<font face=\"verdana\", size=\"2\">"], args: false)
+    Enum.reverse(html)
+  end
+
+  def colourize([], html, _) do
+    ["</font>" | html]
+  end
+
+  def colourize([{type, line, this_token} | tokens], html, flags) do
+    this_token = encode_entities(this_token)
+
+    {colour, token, flags} =
+      case type do
+        :atom ->
+          {@atom_colour, this_token, flags}
+
+        :argsbegin ->
+          flags = Keyword.replace!(flags, :args, true)
+          {nil, this_token, flags}
+
+        :argsend ->
+          flags = Keyword.replace!(flags, :args, false)
+          {nil, this_token, flags}
+
+        :block ->
+          {@block_colour, this_token, flags}
+
+        :brackets ->
+          {nil, this_token, flags}
+
+        :comment ->
+          {@comment_colour, "#{this_token}<br>", flags}
+
+        :define ->
+          {@define_colour, this_token, flags}
+
+        :directive ->
+          {@directive_colour, this_token, flags}
+
+        :eol ->
+          {nil, "<br>\n", flags}
+
+        :identifier ->
+          case flags[:args] do
+            false -> {@identifier_colour, this_token, flags}
+            true -> {@argument_colour, this_token, flags}
+          end
+
+        :integer ->
+          {nil, this_token, flags}
+
+        :module ->
+          {@module_colour, this_token, flags}
+
+        :nullarg ->
+          {@nullarg_colour, this_token, flags}
+
+        :pointer ->
+          {nil, this_token, flags}
+
+        :punctuation ->
+          {nil, this_token, flags}
+
+        :string ->
+          # Logger.info("String: #{inspect({type, line, this_token})}")
+          {@string_colour, this_token, flags}
+
+        :syntax ->
+          {nil, this_token, flags}
+
+        :whitespace ->
+          {nil, "&nbsp;", flags}
+
+        _ ->
+          Logger.error("Unhandled token: #{inspect({type, line, this_token})}")
+          {nil, this_token, flags}
+      end
+
+    htmlToken = colour(token, colour)
+    colourize(tokens, [htmlToken | html], flags)
+  end
+
+  @doc """
+  Vgiven a token and a colour, return the necessary HTML
+  """
+  def colour(token, nil), do: "#{token}"
+  def colour(token, colour), do: "<font color=\"#{colour}\">#{token}</font>"
+
+  @doc """
+  Interface to leex
+  """
+  def lex(s) when is_binary(s), do: s |> to_charlist |> lex
+
+  def lex(s) do
+    case :elixir_lexer.string(s) do
+      {:ok, tokens, _} ->
+        {:ok, tokens}
+
+      {:error, {1, :elixir_lexer, {:illegal, 'd'}}, 1} ->
+        Logger.error("lexer error: #{inspect({:error, {1, :elixir_lexer, {:illegal, 'd'}}, 1})}")
+        {:error, []}
+    end
+  end
+
+  @doc """
+  Encode the HTML entities so that the dont screw up the HTML representation.
+  """
+  def encode_entities(charlist) do
+    Enum.map(charlist, fn x -> encode_entity(x) end)
+  end
+
+  defp encode_entity(x) do
+    char =
+      case [x] do
+        '<' -> '&lt;'
+        '>' -> '&gt;'
+        '&' -> '&amp;'
+        '"' -> '&quot;'
+        '\'' -> '&apos;'
+        _ -> x
+      end
+
+    char
+  end
+
+  @doc """
+  Given the input file from the command line, normalize it, and generate an html
+  file name for the output.
+  """
+  def getFiles(input) do
+    # Logger.info("input = #{inspect(input)}")
+
+    input =
+      case String.first(input) do
+        "/" -> input
+        _ -> System.cwd() |> Path.join(input)
+      end
+
+    # Logger.info("full input = #{inspect(input)}")
+
+    # Logger.info("reversed = #{inspect(String.reverse(input))}")
+    # Logger.info("split = #{inspect(String.reverse(input))}")
+
+    case File.exists?(input) do
+      true ->
+        res = String.split(String.reverse(input), ".", parts: 2)
+
+        output =
+          case res do
+            [ext, path] -> String.reverse(path) <> ".html"
+            [path] -> String.reverse(path) <> ".html"
+          end
+
+        {:ok, input, output}
+
+      false ->
+        {:error, "The file #{inspect(input)} does not exist"}
+    end
+  end
+end

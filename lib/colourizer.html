@@ -1,0 +1,236 @@
+<font face="verdana", size="2"><font color="#A74AC7">defmodule</font>&nbsp;<font color="sienna">Colourizer</font>&nbsp;<font color="#A74AC7">do</font><br>
+&nbsp;&nbsp;<font color="red">@argument_colour</font>&nbsp;<font color="green">&apos;sienna&apos;</font><br>
+&nbsp;&nbsp;<font color="red">@atom_colour</font>&nbsp;<font color="green">&apos;blue&apos;</font><br>
+&nbsp;&nbsp;<font color="red">@block_colour</font>&nbsp;<font color="green">&apos;#A74AC7&apos;</font><br>
+&nbsp;&nbsp;<font color="red">@comment_colour</font>&nbsp;<font color="green">&apos;gray&apos;</font><br>
+&nbsp;&nbsp;<font color="red">@define_colour</font>&nbsp;<font color="green">&apos;red&apos;</font><br>
+&nbsp;&nbsp;<font color="red">@directive_colour</font>&nbsp;<font color="green">&apos;red&apos;</font><br>
+&nbsp;&nbsp;<font color="red">@identifier_colour</font>&nbsp;<font color="green">&apos;black&apos;</font><br>
+&nbsp;&nbsp;<font color="red">@key_colour</font>&nbsp;<font color="green">&apos;sky blue&apos;</font><br>
+&nbsp;&nbsp;<font color="red">@module_colour</font>&nbsp;<font color="green">&apos;sienna&apos;</font><br>
+&nbsp;&nbsp;<font color="red">@nullarg_colour</font>&nbsp;<font color="green">&apos;gray&apos;</font><br>
+&nbsp;&nbsp;<font color="red">@string_colour</font>&nbsp;<font color="green">&apos;green&apos;</font><br>
+<br>
+&nbsp;&nbsp;<font color="red">require</font>&nbsp;<font color="sienna">Logger</font><br>
+<br>
+&nbsp;&nbsp;<font color="red">@moduledoc</font>&nbsp;<font color="green">&quot;&quot;&quot;</font><br>
+&nbsp;&nbsp;<font color="gray">## NAME
+<br></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">extohtml</font><br>
+<br>
+&nbsp;&nbsp;<font color="gray">## SYNOPSIS
+<br></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">extohtml</font>&nbsp;<font color="black">file</font><br>
+<br>
+&nbsp;&nbsp;<font color="gray">## DESCRIPTION
+<br></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="sienna">Creates</font>&nbsp;<font color="black">an</font>&nbsp;<font color="sienna">HTML</font>&nbsp;<font color="black">file</font>&nbsp;<font color="black">containing</font>&nbsp;<font color="black">a</font>&nbsp;<font color="black">colourised</font>&nbsp;<font color="black">representation</font>&nbsp;<font color="black">of</font>&nbsp;<font color="black">the</font>&nbsp;<font color="black">input</font>&nbsp;<font color="black">file</font>.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="sienna">The</font>&nbsp;<font color="black">input</font>&nbsp;<font color="black">file</font>&nbsp;<font color="black">is</font>&nbsp;<font color="black">expected</font>&nbsp;<font color="black">to</font>&nbsp;<font color="black">contain</font>&nbsp;<font color="sienna">Elixir</font>&nbsp;<font color="black">code</font>.<br>
+&nbsp;&nbsp;<font color="green">&quot;&quot;&quot;</font><br>
+<br>
+&nbsp;&nbsp;<font color="red">@doc</font>&nbsp;<font color="green">&quot;&quot;&quot;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="sienna">Main</font>&nbsp;<font color="black">entry</font>&nbsp;<font color="black">point</font>&nbsp;<font color="black">for</font>&nbsp;<font color="black">escript</font>.&nbsp;<font color="sienna">The</font>&nbsp;<font color="black">argument</font>&nbsp;<font color="black">is</font>&nbsp;<font color="black">the</font>&nbsp;<font color="black">name</font>&nbsp;<font color="black">of</font>&nbsp;<font color="black">the</font>&nbsp;<font color="black">source</font>&nbsp;<font color="black">file</font>.<br>
+&nbsp;&nbsp;<font color="green">&quot;&quot;&quot;</font><br>
+&nbsp;&nbsp;<font color="#A74AC7">def</font>&nbsp;<font color="black">main</font>(<font color="sienna">args</font>)&nbsp;<font color="#A74AC7">do</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="gray"># Logger.info(&quot;Args: #{inspect(args)}&quot;)
+<br></font>&nbsp;&nbsp;&nbsp;&nbsp;[<font color="black">filename</font>]&nbsp;=&nbsp;<font color="black">args</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">case</font>&nbsp;<font color="black">getFiles</font>(<font color="sienna">filename</font>)&nbsp;<font color="#A74AC7">do</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="blue">:error</font>,&nbsp;<font color="black">why</font>}&nbsp;-&gt;&nbsp;<font color="sienna">IO</font>.<font color="black">puts</font>(<font color="sienna">why</font>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="blue">:ok</font>,&nbsp;<font color="black">inputFile</font>,&nbsp;<font color="black">outputFile</font>}&nbsp;-&gt;&nbsp;<font color="black">colourize</font>(<font color="sienna">inputFile</font>,&nbsp;<font color="sienna">outputFile</font>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
+&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
+<br>
+&nbsp;&nbsp;<font color="red">@doc</font>&nbsp;<font color="green">&quot;&quot;&quot;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="sienna">Colourise</font>&nbsp;<font color="black">the</font>&nbsp;<font color="black">contents</font>&nbsp;<font color="black">of</font>&nbsp;<font color="black">the</font>&nbsp;<font color="black">input</font>&nbsp;<font color="black">file</font>,&nbsp;<font color="black">checking</font>&nbsp;<font color="black">that</font>&nbsp;<font color="black">the</font>&nbsp;<font color="black">input</font>&nbsp;<font color="black">file</font>&nbsp;<font color="black">is</font>&nbsp;<font color="sienna">OK</font>.<br>
+&nbsp;&nbsp;<font color="green">&quot;&quot;&quot;</font><br>
+&nbsp;&nbsp;<font color="#A74AC7">def</font>&nbsp;<font color="black">colourize</font>(<font color="sienna">inputFile</font>,&nbsp;<font color="sienna">outputFile</font>)&nbsp;<font color="#A74AC7">do</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">tokens</font>&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">case</font>&nbsp;<font color="sienna">File</font>.<font color="black">read</font>(<font color="sienna">inputFile</font>)&nbsp;<font color="#A74AC7">do</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="blue">:ok</font>,&nbsp;<font color="black">code</font>}&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">case</font>&nbsp;<font color="black">lex</font>(<font color="sienna">code</font>)&nbsp;<font color="#A74AC7">do</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="blue">:ok</font>,&nbsp;<font color="black">tokens</font>}&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">tokens</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">why</font>&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="sienna">IO</font>.<font color="black">puts</font>(<font color="sienna">why</font>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="blue">:error</font>,&nbsp;<font color="black">why</font>}&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="sienna">IO</font>.<font color="black">puts</font>(<font color="sienna">why</font>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">html</font>&nbsp;=&nbsp;<font color="sienna">Enum</font>.<font color="black">join</font>(<font color="sienna">colourize</font>(<font color="sienna">tokens</font>))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="gray"># Logger.info(&quot;html 1 = #{inspect(html)}&quot;)
+<br></font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="gray"># Logger.info(&quot;Writing to: #{inspect(outputFile)}&quot;)
+<br></font>&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">:ok</font>&nbsp;=&nbsp;<font color="sienna">File</font>.<font color="black">write</font>(<font color="sienna">outputFile</font>,&nbsp;<font color="sienna">html</font>,&nbsp;[<font color="blue">:write</font>])<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<font color="blue">:ok</font>,&nbsp;<font color="black">self</font>()}<br>
+&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
+<br>
+&nbsp;&nbsp;<font color="red">@doc</font>&nbsp;<font color="green">&quot;&quot;&quot;</font><br>
+&nbsp;&nbsp;<font color="sienna">Iterate</font>&nbsp;<font color="black">over</font>&nbsp;<font color="black">the</font>&nbsp;<font color="black">list</font>&nbsp;<font color="black">of</font>&nbsp;<font color="black">tokens</font>&nbsp;<font color="black">returned</font>&nbsp;<font color="black">by</font>&nbsp;<font color="black">lex</font>,&nbsp;<font color="black">turning</font>&nbsp;<font color="black">them</font>&nbsp;<font color="black">into</font>&nbsp;<font color="sienna">HTML</font><br>
+&nbsp;&nbsp;<font color="green">&quot;&quot;&quot;</font><br>
+&nbsp;&nbsp;<font color="gray"># Logger.info(&quot;#{inspect(tokens)}&quot;)
+<br></font>&nbsp;&nbsp;<font color="#A74AC7">def</font>&nbsp;<font color="black">colourize</font>(<font color="sienna">tokens</font>)&nbsp;<font color="#A74AC7">do</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">html</font>&nbsp;=&nbsp;<font color="black">colourize</font>(<font color="sienna">tokens</font>,&nbsp;[<font color="green">&quot;&lt;font face=\&quot;verdana\&quot;, size=\&quot;2\&quot;&gt;&quot;</font>],&nbsp;<font color="sienna">args</font>:&nbsp;<font color="sienna">false</font>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="sienna">Enum</font>.<font color="black">reverse</font>(<font color="sienna">html</font>)<br>
+&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
+<br>
+&nbsp;&nbsp;<font color="#A74AC7">def</font>&nbsp;<font color="black">colourize</font>([],&nbsp;<font color="sienna">html</font>,&nbsp;_)&nbsp;<font color="#A74AC7">do</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;[<font color="green">&quot;&lt;/font&gt;&quot;</font>&nbsp;|&nbsp;<font color="black">html</font>]<br>
+&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
+<br>
+&nbsp;&nbsp;<font color="#A74AC7">def</font>&nbsp;<font color="black">colourize</font>([{<font color="sienna">type</font>,&nbsp;<font color="sienna">line</font>,&nbsp;<font color="sienna">this_token</font>}&nbsp;|&nbsp;<font color="sienna">tokens</font>],&nbsp;<font color="sienna">html</font>,&nbsp;<font color="sienna">flags</font>)&nbsp;<font color="#A74AC7">do</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">this_token</font>&nbsp;=&nbsp;<font color="black">encode_entities</font>(<font color="sienna">this_token</font>)<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<font color="black">colour</font>,&nbsp;<font color="black">token</font>,&nbsp;<font color="black">flags</font>}&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">case</font>&nbsp;<font color="black">type</font>&nbsp;<font color="#A74AC7">do</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">:atom</font>&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="red">@atom_colour</font>,&nbsp;<font color="black">this_token</font>,&nbsp;<font color="black">flags</font>}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">:argsbegin</font>&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">flags</font>&nbsp;=&nbsp;<font color="sienna">Keyword</font>.<font color="black">replace</font>!(<font color="sienna">flags</font>,&nbsp;<font color="blue">:args</font>,&nbsp;<font color="sienna">true</font>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="black">nil</font>,&nbsp;<font color="black">this_token</font>,&nbsp;<font color="black">flags</font>}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">:argsend</font>&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">flags</font>&nbsp;=&nbsp;<font color="sienna">Keyword</font>.<font color="black">replace</font>!(<font color="sienna">flags</font>,&nbsp;<font color="blue">:args</font>,&nbsp;<font color="sienna">false</font>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="black">nil</font>,&nbsp;<font color="black">this_token</font>,&nbsp;<font color="black">flags</font>}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">:block</font>&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="red">@block_colour</font>,&nbsp;<font color="black">this_token</font>,&nbsp;<font color="black">flags</font>}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">:brackets</font>&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="black">nil</font>,&nbsp;<font color="black">this_token</font>,&nbsp;<font color="black">flags</font>}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">:comment</font>&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="red">@comment_colour</font>,&nbsp;<font color="green">&quot;#{this_token}&lt;br&gt;&quot;</font>,&nbsp;<font color="black">flags</font>}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">:define</font>&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="red">@define_colour</font>,&nbsp;<font color="black">this_token</font>,&nbsp;<font color="black">flags</font>}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">:directive</font>&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="red">@directive_colour</font>,&nbsp;<font color="black">this_token</font>,&nbsp;<font color="black">flags</font>}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">:eol</font>&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="black">nil</font>,&nbsp;<font color="green">&quot;&lt;br&gt;\n&quot;</font>,&nbsp;<font color="black">flags</font>}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">:identifier</font>&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">case</font>&nbsp;<font color="black">flags</font>[<font color="blue">:args</font>]&nbsp;<font color="#A74AC7">do</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">false</font>&nbsp;-&gt;&nbsp;{<font color="red">@identifier_colour</font>,&nbsp;<font color="black">this_token</font>,&nbsp;<font color="black">flags</font>}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">true</font>&nbsp;-&gt;&nbsp;{<font color="red">@argument_colour</font>,&nbsp;<font color="black">this_token</font>,&nbsp;<font color="black">flags</font>}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">:integer</font>&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="black">nil</font>,&nbsp;<font color="black">this_token</font>,&nbsp;<font color="black">flags</font>}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">:module</font>&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="red">@module_colour</font>,&nbsp;<font color="black">this_token</font>,&nbsp;<font color="black">flags</font>}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">:nullarg</font>&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="red">@nullarg_colour</font>,&nbsp;<font color="black">this_token</font>,&nbsp;<font color="black">flags</font>}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">:pointer</font>&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="black">nil</font>,&nbsp;<font color="black">this_token</font>,&nbsp;<font color="black">flags</font>}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">:punctuation</font>&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="black">nil</font>,&nbsp;<font color="black">this_token</font>,&nbsp;<font color="black">flags</font>}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">:string</font>&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="gray"># Logger.info(&quot;String: #{inspect({type, line, this_token})}&quot;)
+<br></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="red">@string_colour</font>,&nbsp;<font color="black">this_token</font>,&nbsp;<font color="black">flags</font>}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">:syntax</font>&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="black">nil</font>,&nbsp;<font color="black">this_token</font>,&nbsp;<font color="black">flags</font>}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">:whitespace</font>&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="black">nil</font>,&nbsp;<font color="green">&quot;&amp;nbsp;&quot;</font>,&nbsp;<font color="black">flags</font>}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="sienna">Logger</font>.<font color="black">error</font>(<font color="green">&quot;Unhandled token: #{inspect({type, line, this_token})}&quot;</font>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="black">nil</font>,&nbsp;<font color="black">this_token</font>,&nbsp;<font color="black">flags</font>}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">htmlToken</font>&nbsp;=&nbsp;<font color="black">colour</font>(<font color="sienna">token</font>,&nbsp;<font color="sienna">colour</font>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">colourize</font>(<font color="sienna">tokens</font>,&nbsp;[<font color="sienna">htmlToken</font>&nbsp;|&nbsp;<font color="sienna">html</font>],&nbsp;<font color="sienna">flags</font>)<br>
+&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
+<br>
+&nbsp;&nbsp;<font color="red">@doc</font>&nbsp;<font color="green">&quot;&quot;&quot;</font><br>
+&nbsp;&nbsp;<font color="sienna">Vgiven</font>&nbsp;<font color="black">a</font>&nbsp;<font color="black">token</font>&nbsp;<font color="black">and</font>&nbsp;<font color="black">a</font>&nbsp;<font color="black">colour</font>,&nbsp;<font color="black">return</font>&nbsp;<font color="black">the</font>&nbsp;<font color="black">necessary</font>&nbsp;<font color="sienna">HTML</font><br>
+&nbsp;&nbsp;<font color="green">&quot;&quot;&quot;</font><br>
+&nbsp;&nbsp;<font color="#A74AC7">def</font>&nbsp;<font color="black">colour</font>(<font color="sienna">token</font>,&nbsp;<font color="sienna">nil</font>),&nbsp;<font color="#A74AC7">do</font>:&nbsp;<font color="green">&quot;#{token}&quot;</font><br>
+&nbsp;&nbsp;<font color="#A74AC7">def</font>&nbsp;<font color="black">colour</font>(<font color="sienna">token</font>,&nbsp;<font color="sienna">colour</font>),&nbsp;<font color="#A74AC7">do</font>:&nbsp;<font color="green">&quot;&lt;font color=\&quot;#{colour}\&quot;&gt;#{token}&lt;/font&gt;&quot;</font><br>
+<br>
+&nbsp;&nbsp;<font color="red">@doc</font>&nbsp;<font color="green">&quot;&quot;&quot;</font><br>
+&nbsp;&nbsp;<font color="sienna">Interface</font>&nbsp;<font color="black">to</font>&nbsp;<font color="black">leex</font><br>
+&nbsp;&nbsp;<font color="green">&quot;&quot;&quot;</font><br>
+&nbsp;&nbsp;<font color="#A74AC7">def</font>&nbsp;<font color="black">lex</font>(<font color="sienna">s</font>)&nbsp;<font color="black">when</font>&nbsp;<font color="black">is_binary</font>(<font color="sienna">s</font>),&nbsp;<font color="#A74AC7">do</font>:&nbsp;<font color="black">s</font>&nbsp;|&gt;&nbsp;<font color="black">to_charlist</font>&nbsp;|&gt;&nbsp;<font color="black">lex</font><br>
+<br>
+&nbsp;&nbsp;<font color="#A74AC7">def</font>&nbsp;<font color="black">lex</font>(<font color="sienna">s</font>)&nbsp;<font color="#A74AC7">do</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">case</font>&nbsp;<font color="blue">:elixir_lexer</font>.<font color="black">string</font>(<font color="sienna">s</font>)&nbsp;<font color="#A74AC7">do</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="blue">:ok</font>,&nbsp;<font color="black">tokens</font>,&nbsp;_}&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="blue">:ok</font>,&nbsp;<font color="black">tokens</font>}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="blue">:error</font>,&nbsp;{1,&nbsp;<font color="blue">:elixir_lexer</font>,&nbsp;{<font color="blue">:illegal</font>,&nbsp;<font color="green">&apos;d&apos;</font>}},&nbsp;1}&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="sienna">Logger</font>.<font color="black">error</font>(<font color="green">&quot;lexer error: #{inspect({:error, {1, :elixir_lexer, {:illegal, &apos;d&apos;}}, 1})}&quot;</font>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="blue">:error</font>,&nbsp;[]}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
+&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
+<br>
+&nbsp;&nbsp;<font color="red">@doc</font>&nbsp;<font color="green">&quot;&quot;&quot;</font><br>
+&nbsp;&nbsp;<font color="sienna">Encode</font>&nbsp;<font color="black">the</font>&nbsp;<font color="sienna">HTML</font>&nbsp;<font color="black">entities</font>&nbsp;<font color="black">so</font>&nbsp;<font color="black">that</font>&nbsp;<font color="black">the</font>&nbsp;<font color="black">dont</font>&nbsp;<font color="black">screw</font>&nbsp;<font color="black">up</font>&nbsp;<font color="black">the</font>&nbsp;<font color="sienna">HTML</font>&nbsp;<font color="black">representation</font>.<br>
+&nbsp;&nbsp;<font color="green">&quot;&quot;&quot;</font><br>
+&nbsp;&nbsp;<font color="#A74AC7">def</font>&nbsp;<font color="black">encode_entities</font>(<font color="sienna">charlist</font>)&nbsp;<font color="#A74AC7">do</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="sienna">Enum</font>.<font color="black">map</font>(<font color="sienna">charlist</font>,&nbsp;<font color="sienna">fn</font>&nbsp;<font color="sienna">x</font>&nbsp;-&gt;&nbsp;<font color="sienna">encode_entity</font>(<font color="sienna">x</font>)&nbsp;<font color="#A74AC7">end</font>)<br>
+&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
+<br>
+&nbsp;&nbsp;<font color="black">defp</font>&nbsp;<font color="black">encode_entity</font>(<font color="sienna">x</font>)&nbsp;<font color="#A74AC7">do</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">char</font>&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">case</font>&nbsp;[<font color="black">x</font>]&nbsp;<font color="#A74AC7">do</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="green">&apos;&lt;&apos; -&gt; &apos;&amp;lt;&apos;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="green">&apos;&gt;&apos; -&gt; &apos;&amp;gt;&apos;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="green">&apos;&amp;&apos; -&gt; &apos;&amp;amp;&apos;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="green">&apos;&quot;&apos; -&gt; &apos;&amp;quot;&apos;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="green">&apos;\&apos;&apos; -&gt; &apos;&amp;apos;&apos;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_&nbsp;-&gt;&nbsp;<font color="black">x</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">char</font><br>
+&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
+<br>
+&nbsp;&nbsp;<font color="red">@doc</font>&nbsp;<font color="green">&quot;&quot;&quot;</font><br>
+&nbsp;&nbsp;<font color="sienna">Given</font>&nbsp;<font color="black">the</font>&nbsp;<font color="black">input</font>&nbsp;<font color="black">file</font>&nbsp;<font color="black">from</font>&nbsp;<font color="black">the</font>&nbsp;<font color="black">command</font>&nbsp;<font color="black">line</font>,&nbsp;<font color="black">normalize</font>&nbsp;<font color="black">it</font>,&nbsp;<font color="black">and</font>&nbsp;<font color="black">generate</font>&nbsp;<font color="black">an</font>&nbsp;<font color="black">html</font><br>
+&nbsp;&nbsp;<font color="black">file</font>&nbsp;<font color="black">name</font>&nbsp;<font color="black">for</font>&nbsp;<font color="black">the</font>&nbsp;<font color="black">output</font>.<br>
+&nbsp;&nbsp;<font color="green">&quot;&quot;&quot;</font><br>
+&nbsp;&nbsp;<font color="#A74AC7">def</font>&nbsp;<font color="black">getFiles</font>(<font color="sienna">input</font>)&nbsp;<font color="#A74AC7">do</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="gray"># Logger.info(&quot;input = #{inspect(input)}&quot;)
+<br></font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">input</font>&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">case</font>&nbsp;<font color="sienna">String</font>.<font color="black">first</font>(<font color="sienna">input</font>)&nbsp;<font color="#A74AC7">do</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="green">&quot;/&quot;</font>&nbsp;-&gt;&nbsp;<font color="black">input</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_&nbsp;-&gt;&nbsp;<font color="sienna">System</font>.<font color="black">cwd</font>()&nbsp;|&gt;&nbsp;<font color="sienna">Path</font>.<font color="black">join</font>(<font color="sienna">input</font>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="gray"># Logger.info(&quot;full input = #{inspect(input)}&quot;)
+<br></font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="gray"># Logger.info(&quot;reversed = #{inspect(String.reverse(input))}&quot;)
+<br></font>&nbsp;&nbsp;&nbsp;&nbsp;<font color="gray"># Logger.info(&quot;split = #{inspect(String.reverse(input))}&quot;)
+<br></font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">case</font>&nbsp;<font color="sienna">File</font>.<font color="black">exists</font>?(<font color="sienna">input</font>)&nbsp;<font color="#A74AC7">do</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">true</font>&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">res</font>&nbsp;=&nbsp;<font color="sienna">String</font>.<font color="black">split</font>(<font color="sienna">String</font>.<font color="sienna">reverse</font>(<font color="sienna">input</font>),&nbsp;<font color="green">&quot;.&quot;</font>,&nbsp;<font color="black">parts</font>:&nbsp;2)<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">output</font>&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">case</font>&nbsp;<font color="black">res</font>&nbsp;<font color="#A74AC7">do</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<font color="black">ext</font>,&nbsp;<font color="black">path</font>]&nbsp;-&gt;&nbsp;<font color="sienna">String</font>.<font color="black">reverse</font>(<font color="sienna">path</font>)&nbsp;&lt;&gt;&nbsp;<font color="green">&quot;.html&quot;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<font color="black">path</font>]&nbsp;-&gt;&nbsp;<font color="sienna">String</font>.<font color="black">reverse</font>(<font color="sienna">path</font>)&nbsp;&lt;&gt;&nbsp;<font color="green">&quot;.html&quot;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="blue">:ok</font>,&nbsp;<font color="black">input</font>,&nbsp;<font color="black">output</font>}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="black">false</font>&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="blue">:error</font>,&nbsp;<font color="green">&quot;The file #{inspect(input)} does not exist&quot;</font>}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
+&nbsp;&nbsp;<font color="#A74AC7">end</font><br>
+<font color="#A74AC7">end</font><br>
+</font>
