@@ -6,7 +6,7 @@ defmodule Colourizer do
   @define_colour 'red'
   @directive_colour 'red'
   @identifier_colour 'black'
-  @key_colour 'sky blue'
+  # @key_colour 'sky blue'
   @module_colour 'sienna'
   @nullarg_colour 'gray'
   @string_colour 'green'
@@ -222,7 +222,7 @@ defmodule Colourizer do
 
         output =
           case res do
-            [ext, path] -> String.reverse(path) <> ".html"
+            [_ext, path] -> String.reverse(path) <> ".html"
             [path] -> String.reverse(path) <> ".html"
           end
 
